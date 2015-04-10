@@ -366,7 +366,7 @@ describe '| regression-sprint-1 |', ->                                          
                 done()
 
   it 'Issue 644 - Validate icon for each Technology or Type', (done)->
-    mappings =
+    mappings =  # mapping the technology or type to the icon title & class
       "Web Application" : { title : "Web Application" , class : "technology-icon web-app"     }
       "All"             : { title : "Any Technology"  , class : "fi-flag"                     }
       "C++"             : { title : "C++"             , class : "technology-icon c-plus-plus" }
@@ -386,6 +386,7 @@ describe '| regression-sprint-1 |', ->                                          
     jade.login_As_User ()->
       jade.page_User_Index (html,$)->
 
+        # span tag for filter-filter.title added in search-mixins.jade line #176
         technology = $('#filter-Technology')
         phase      = $('#filter-Phase')
         type       = $('#filter-Type')
@@ -393,14 +394,14 @@ describe '| regression-sprint-1 |', ->                                          
         # Technology
         $(technology.find('h4')).html().assert_Is 'Technology'        # checking Technology values and icons
 
-        technology.find('td').each (index, td)->
-          using $(td),->
-            text = $(@.find('span').eq(1)).html()
-            mappings[text].assert_Is_Object()
-            if mappings[text].class.starts_With('fi')
-              $(@.find('i')).attr().assert_Is mappings[text]
+        technology.find('td').each (index, td)->                      # getting table data and index for each technology
+          using $(td),->                                              # using table data
+            text = $(@.find('span').eq(1)).html()                     # find each technology value from the 2nd span tag
+            mappings[text].assert_Is_Object()                         # assert that technology name is listed in mappings
+            if mappings[text].class.starts_With('fi')                 # take into account technology icon metadata within <i> tag rather than <div>
+              $(@.find('i')).attr().assert_Is mappings[text]          # find and assert title & class attributes for the technology icon within <i> tag element
             else
-              $(@.find('div')).attr().assert_Is mappings[text]
+              $(@.find('div')).attr().assert_Is mappings[text]        # else find and assert title & class attributes for the technology icon within the <div> tag element
 
         # Phase
         $(phase.find('h4')).html().assert_Is 'Phase'                # checking Phase value (no icons for phase)
@@ -408,10 +409,10 @@ describe '| regression-sprint-1 |', ->                                          
         # Type
         $(type.find('h4')).html().assert_Is 'Type'                  # checking Type values and icons
 
-        type.find('td').each (index, td)->
-          using $(td),->
-            text = $(@.find('span').eq(1)).html()
-            mappings[text].assert_Is_Object()
-            $(@.find('i')).attr().assert_Is mappings[text]
+        type.find('td').each (index, td)->                          # getting table data and index for each type
+          using $(td),->                                            # using table data
+            text = $(@.find('span').eq(1)).html()                   # find each type value from 2nd span tag
+            mappings[text].assert_Is_Object()                       # assert that type name is listed in mappings
+            $(@.find('i')).attr().assert_Is mappings[text]          # find and assert all type icon metadata within the first span <i> tag elements
 
         done()
